@@ -5,10 +5,17 @@
       You pressed the button {{count}} times.
     </p>
     <button @click="addOne">{{buttonLabel}}</button>
+    <button @click="addIndex">Add Index</button>
+    <br>
+    <button @click="addTodo">Add Random Todo</button>
+    <ul>
+     <li v-for="todo in todos">{{todo.text}}</li>
+    </ul>
   </div>
 </template>
 
 <script>
+  import {Todos} from '/imports/api/todos.js';
   import {ReactiveVar} from 'meteor/reactive-var';
   import Vue from 'vue';
 
@@ -25,13 +32,17 @@
   export default {
     data() {
       return {
+        index: 1,
         buttonLabel: 'Click me!'
       }
     },
 
     computed: {
       count() {
-        return counter.get();
+        return counter.get() + this.index;
+      },
+      todos() {
+        return Todos.find({}, {limit: this.count}).fetch()
       }
     },
 
@@ -40,6 +51,12 @@
         counter.set(counter.get() + 1);
 
         this.buttonLabel = labels[Math.round(Math.random() * (labels.length - 1))];
+      },
+      addTodo() {
+        Todos.insert({text: Math.random().toString(36).substring(2) });
+      },
+      addIndex() {
+        this.index = this.index + 1
       }
     }
   }
